@@ -2,6 +2,11 @@
 import cookie from 'cookie';
 
 export default async function handler(req, res) {
+
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Or set to 'null' for Figma plugin stricter policy
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   const { COOKIE_NAME = 'figma_auth' } = process.env;
 
   // Parse cookies

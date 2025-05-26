@@ -53,6 +53,12 @@ export default async function handler(req, res) {
     }));
 
     res.redirect('/'); // redirect to home or wherever you want
+    return{ tokens: {
+          access_token: json.access_token,
+          refresh_token: json.refresh_token,
+          expires_in: json.expires_in,
+          token_type: json.token_type || "Bearer",
+        }}
 
   } catch (error) {
     res.status(500).json({ error: error.message });

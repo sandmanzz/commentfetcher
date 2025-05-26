@@ -39,10 +39,9 @@ export default async function handler(req, res) {
     // Set a cookie with the access token
     res.setHeader('Set-Cookie', cookie.serialize(COOKIE_NAME, tokenData.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: tokenData.expires_in,
-      path: '/',
-      sameSite: 'lax',
+        secure: true,
+        path: '/',
+        maxAge: tokenData.expires_in,
     }));
 
     res.redirect('/'); // redirect to home or wherever you want

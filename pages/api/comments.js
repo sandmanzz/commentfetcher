@@ -46,9 +46,11 @@ export default async function handler(req, res) {
     }
 
     const comments = await figmaRes.json();
-
+    console.log($file)
     res.status(200).json(comments);
   } catch (error) {
+    console.log("${fileId}");
+    console.error('Error fetching comments from Figma:', error); // Add this line
     res.status(500).json({ error: error.message });
   }
 }

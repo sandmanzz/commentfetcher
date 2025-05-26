@@ -1,47 +1,53 @@
 // pages/api/callback.js
+import cookie from 'cookie';
 
-const cookie = require('cookie');
-
-module.exports = async function handler(req, res) {
-  const { 
-    FIGMA_CLIENT_ID, 
-    FIGMA_CLIENT_SECRET, 
-    REDIRECT_URI, 
-    COOKIE_NAME = 'figma_auth' } = process.env;
-
-
+export default async function handler(req, res) {
+  const {
+    FIGMA_CLIENT_ID,
+    FIGMA_CLIENT_SECRET,
+    REDIRECT_URI,
+    COOKIE_NAME = 'figma_auth',
+  } = process.env;
 
   const code = req.query.code;
 
   if (!code) {
-    return res.status(400).json({ error: 'Missing code from Figma' });
+    return res.status(400).json({ error: 'Missing code query parameter' });
   }
 
-  const response = await fetch('https://www.figma.com/api/oauth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id: FIGMA_CLIENT_ID,
-      client_secret: FIGMA_CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-      code,
-      grant_type: 'authorization_code',
-    }),
-  });
+  // Exchange code for access token
+  const params = new URLSearchParams();
+  params.append('client_id', FIGMA_CLIENT_ID);
+  params.append('client_secret', FIGMA_CLIENT_SECRET);
+  params.append('redirect_uri', REDIRECT_URI);
+  params.append('code', code);
+  params.append('grant_type', 'authorization_code');
 
-  const data = await response.json();
+  try {
+    const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+    });
 
-  if (data.access_token) {
-    res.setHeader(
-      'Set-Cookie',
-      cookie.serialize(COOKIE_NAME, data.access_token, {
-        httpOnly: true,
-        maxAge: 3600,
-        path: '/',
-      })
-    );
-    res.redirect('/api/comments'); // optional: redirect somewhere useful
-  } else {
-    res.status(500).json({ error: 'Failed to get access token', details: data });
+    if (!tokenRes.ok) {
+      throw new Error(`Figma token request failed: ${tokenRes.statusText}`);
+    }
+
+    const tokenData = await tokenRes.json();
+
+    // Set a cookie with the access token
+    res.setHeader('Set-Cookie', cookie.serialize(COOKIE_NAME, tokenData.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: tokenData.expires_in,
+      path: '/',
+      sameSite: 'lax',
+    }));
+
+    res.redirect('/'); // redirect to home or wherever you want
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }

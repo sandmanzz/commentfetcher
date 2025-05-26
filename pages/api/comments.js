@@ -1,32 +1,40 @@
 // pages/api/comments.js
+import cookie from 'cookie';
 
-const cookie = require('cookie');
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   const { COOKIE_NAME = 'figma_auth' } = process.env;
+
+  // Parse cookies
   const cookies = cookie.parse(req.headers.cookie || '');
   const accessToken = cookies[COOKIE_NAME];
-  const fileKey = req.query.file_key;
 
   if (!accessToken) {
-    return res.status(401).json({ error: 'Not authenticated' });
+    return res.status(401).json({ error: 'Unauthorized. Missing access token.' });
   }
 
-  if (!fileKey) {
-    return res.status(400).json({ error: 'Missing file_key in query' });
+  // Here you would call the Figma API to fetch comments
+  // Example: Fetch comments from a file ID (passed as query param)
+  const { fileId } = req.query;
+
+  if (!fileId) {
+    return res.status(400).json({ error: 'Missing fileId query parameter' });
   }
 
-  const response = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  try {
+    const figmaRes = await fetch(`https://api.figma.com/v1/files/${fileId}/comments`, {
+      headers: {
+        'X-Figma-Token': accessToken,
+      },
+    });
 
-  const data = await response.json();
+    if (!figmaRes.ok) {
+      throw new Error(`Figma API error: ${figmaRes.statusText}`);
+    }
 
-  if (response.ok) {
-    res.status(200).json(data);
-  } else {
-    res.status(response.status).json({ error: 'Failed to fetch comments', details: data });
+    const comments = await figmaRes.json();
+
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }

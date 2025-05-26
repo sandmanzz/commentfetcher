@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const tokenRes = await fetch('https//api.figma.com/v1/oauth/token', {
   
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' ,'Authorization: `Basic ${credentials}'},
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' ,'Authorization': 'Basic ${credentials}'},
       body: params.toString(),
     });
 

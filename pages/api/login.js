@@ -1,5 +1,5 @@
 // pages/api/login.js
-module.exports = function handler(req, res) {
+export default function handler(req, res) {
   const { FIGMA_CLIENT_ID, REDIRECT_URI } = process.env;
 
   if (!FIGMA_CLIENT_ID || !REDIRECT_URI) {

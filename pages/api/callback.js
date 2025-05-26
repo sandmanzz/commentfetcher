@@ -24,7 +24,10 @@ export default async function handler(req, res) {
   params.append('grant_type', 'authorization_code');
 
   try {
-    const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+    console.log(params.toString());
+    //const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+    const tokenRes = await fetch('https//api.figma.com/v1/oauth/token', {
+  
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),

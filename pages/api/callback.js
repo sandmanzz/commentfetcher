@@ -3,7 +3,13 @@
 const cookie = require('cookie');
 
 module.exports = async function handler(req, res) {
-  const { FIGMA_CLIENT_ID, FIGMA_CLIENT_SECRET, REDIRECT_URI, COOKIE_NAME = 'figma_auth' } = process.env;
+  const { 
+    FIGMA_CLIENT_ID, 
+    FIGMA_CLIENT_SECRET, 
+    REDIRECT_URI, 
+    COOKIE_NAME = 'figma_auth' } = process.env;
+
+
 
   const code = req.query.code;
 

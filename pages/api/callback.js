@@ -23,13 +23,17 @@ export default async function handler(req, res) {
   params.append('code', code);
   params.append('grant_type', 'authorization_code');
 
+  const credentials = Buffer.from(
+        `${FIGMA_CLIENT_ID}:${FIGMA_CLIENT_SECRET}`
+      ).toString("base64");
+
   try {
     console.log(params.toString());
     //const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
     const tokenRes = await fetch('https//api.figma.com/v1/oauth/token', {
   
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' ,'Authorization: `Basic ${credentials}'},
       body: params.toString(),
     });
 

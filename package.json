@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sandmanzz/figmacomment.git"
+    "url": "git+https://github.com/sandmanzz/commentfetcher.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/sandmanzz/figmacomment/issues"
+    "url": "https://github.com/sandmanzz/commentfetcher/issues"
   },
-  "homepage": "https://github.com/sandmanzz/figmacomment#readme",
+  "homepage": "https://github.com/sandmanzz/commentfetcher#readme",
   "dependencies": {
     "axios": "^1.9.0",
     "cookie": "^1.0.2",

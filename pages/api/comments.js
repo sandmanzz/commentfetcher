@@ -1,7 +1,8 @@
 // pages/api/comments.js
-import cookie from 'cookie';
 
-export default async function handler(req, res) {
+const cookie = require('cookie');
+
+module.exports = async function handler(req, res) {
   const { COOKIE_NAME = 'figma_auth' } = process.env;
   const cookies = cookie.parse(req.headers.cookie || '');
   const accessToken = cookies[COOKIE_NAME];

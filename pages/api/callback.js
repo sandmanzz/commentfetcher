@@ -35,6 +35,7 @@ export default async function handler(req, res) {
 
     if (!tokenRes.ok) {
       throw new Error(`Figma token request failed: ${tokenRes.statusText}`);
+      console.log(params.toString());
     }
 
     const tokenData = await tokenRes.json();

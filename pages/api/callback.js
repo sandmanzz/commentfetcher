@@ -174,10 +174,11 @@ export default async function handler(req, res) {
   const client_secret = "n9uWTExMsVfzCYrH3LRPuXgYWXlZYm";
   const redirect_uri = "https://commentfetcher.vercel.app/api/callback";
 
-  const response = await fetch("https://www.figma.com/api/oauth/token", {
+  const response = await fetch("https://api.figma.com/v1/oauth/token", {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString("base64")}`
     },
     body: new URLSearchParams({
       client_id,

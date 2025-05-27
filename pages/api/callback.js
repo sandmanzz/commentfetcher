@@ -98,10 +98,64 @@
 //   }
 // }
 
-import { storeToken } from '../tokenstore';
+//6eXKTOkWGg2T8aMLNI4mSU
+
+// import { storeToken } from './token';
+
+// export default async function handler(req, res) {
+//   if (req.method === 'OPTIONS') {
+//     res.setHeader('Access-Control-Allow-Origin', '*'); // or 'null' for Figma plugin
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//     res.status(200).end(); // important: must return 200 OK
+//     return;
+//   }
+
+
+//   // Actual request (GET, POST, etc.)
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//   const { code, state } = req.query;
+
+//   if (!code || !state) {
+//     return res.status(400).json({ error: "Missing code or state" });
+//   }
+
+//   try {
+//     const params = new URLSearchParams();
+//     params.append('client_id', 'ZsfKW7oFqEaSEMMGex3O2G');
+//     params.append('client_secret', 'n9uWTExMsVfzCYrH3LRPuXgYWXlZYm');
+//     params.append('grant_type', 'authorization_code');
+//     params.append('code', code);
+//     params.append('redirect_uri', process.env.FIGMA_REDIRECT_URI);
+//     params.append('code_verifier', state); // state is used as code_verifier
+
+//     const tokenRes = await fetch('https://api.figma.com/v1/oauth/token', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//       body: params.toString(),
+//     });
+
+//     const bodyText = await tokenRes.text();
+//     if (!tokenRes.ok) {
+//       console.error('OAuth Token Error:', bodyText);
+//       return res.status(500).json({ error: 'Token exchange failed', details: bodyText });
+//     }
+
+//     const tokenData = JSON.parse(bodyText);
+
+//     // TEMP: redirect to plugin success page with token in query (insecure for production!)
+//     return res.redirect(`https://www.figma.com/plugin-docs/oauth/?token=${tokenData.access_token}`);
+//   } catch (e) {
+//     console.error('OAuth callback error:', e);
+//     return res.status(500).json({ error: 'Internal server error', details: e.message });
+//   }
+// }
 
 export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') {
+
+   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*'); // or 'null' for Figma plugin
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -114,41 +168,28 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  const { code, state } = req.query;
+  
+  const code = req.query.code;
+  const client_id = "ZsfKW7oFqEaSEMMGex3O2G";
+  const client_secret = "n9uWTExMsVfzCYrH3LRPuXgYWXlZYm";
+  const redirect_uri = "https://commentfetcher.vercel.app/api/callback";
 
-  if (!code || !state) {
-    return res.status(400).json({ error: "Missing code or state" });
-  }
+  const response = await fetch("https://www.figma.com/api/oauth/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+      client_id,
+      client_secret,
+      redirect_uri,
+      code,
+      grant_type: "authorization_code"
+    })
+  });
 
-  try {
-    const params = new URLSearchParams();
-    params.append('client_id', 'ZsfKW7oFqEaSEMMGex3O2G');
-    params.append('client_secret', 'n9uWTExMsVfzCYrH3LRPuXgYWXlZYm');
-    params.append('grant_type', 'authorization_code');
-    params.append('code', code);
-    params.append('redirect_uri', process.env.FIGMA_REDIRECT_URI);
-    params.append('code_verifier', state); // state is used as code_verifier
-
-    const tokenRes = await fetch('https://api.figma.com/v1/oauth/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
-    });
-
-    const bodyText = await tokenRes.text();
-    if (!tokenRes.ok) {
-      console.error('OAuth Token Error:', bodyText);
-      return res.status(500).json({ error: 'Token exchange failed', details: bodyText });
-    }
-
-    const tokenData = JSON.parse(bodyText);
-
-    // TEMP: redirect to plugin success page with token in query (insecure for production!)
-    return res.redirect(`https://www.figma.com/plugin-docs/oauth/?token=${tokenData.access_token}`);
-  } catch (e) {
-    console.error('OAuth callback error:', e);
-    return res.status(500).json({ error: 'Internal server error', details: e.message });
-  }
+  const data = await response.json();
+  res.redirect(`/plugin.html#token=${data.access_token}`);
 }
 
 

@@ -129,7 +129,7 @@ export default async function handler(req, res) {
     params.append("redirect_uri", process.env.FIGMA_REDIRECT_URI);
     params.append("code_verifier", state); // must match what you used in code_challenge
 
-    const tokenRes = await fetch("https://www.figma.com/api/oauth/token", {
+    const tokenRes = await fetch("https://api.figma.com/v1/oauth/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

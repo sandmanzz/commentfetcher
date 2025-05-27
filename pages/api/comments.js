@@ -123,7 +123,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const figmaRes = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
+    const figmaRes = await fetch(`https://api.figma.com/v1/files/6eXKTOkWGg2T8aMLNI4mSU/comments`, {
       headers: {
         Authorization: auth,
       },

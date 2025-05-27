@@ -122,8 +122,8 @@ export default async function handler(req, res) {
 
   try {
     const params = new URLSearchParams();
-    params.append('client_id', process.env.FIGMA_CLIENT_ID);
-    params.append('client_secret', process.env.FIGMA_CLIENT_SECRET);
+    params.append('client_id', 'ZsfKW7oFqEaSEMMGex3O2G');
+    params.append('client_secret', 'n9uWTExMsVfzCYrH3LRPuXgYWXlZYm');
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
     params.append('redirect_uri', process.env.FIGMA_REDIRECT_URI);

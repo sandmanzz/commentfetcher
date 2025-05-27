@@ -69,6 +69,7 @@ export default async function handler(req, res) {
     return;
   }
 
+  
   // Actual request (GET, POST, etc.)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

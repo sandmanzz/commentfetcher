@@ -65,35 +65,64 @@
 //   }
 // }
 
-import { storeToken } from '../utils/tokenStore';
-import fetch from 'node-fetch';
+// import { storeToken } from '../utils/tokenStore';
+// import fetch from 'node-fetch';
+
+// export default async function handler(req, res) {
+//   const { code, state } = req.query;
+
+//   // You should send the code_verifier from the plugin to the server (e.g., via cookies or a custom flow)
+//   const codeVerifier = req.cookies?.figma_code_verifier || 'manually_copy_for_testing';
+
+//   const params = new URLSearchParams({
+//     client_id: process.env.FIGMA_CLIENT_ID,
+//     grant_type: 'authorization_code',
+//     redirect_uri: process.env.REDIRECT_URI,
+//     code,
+//     code_verifier: codeVerifier,
+//   });
+
+//   const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//     body: params.toString(),
+//   });
+
+//   const data = await tokenRes.json();
+
+//   if (data.access_token) {
+//     storeToken(state, data.access_token);
+//     res.send('Login successful! You can close this tab and return to the plugin.');
+//   } else {
+//     res.status(400).json(data);
+//   }
+// }
+
+import { storeToken } from '../tokenstore';
 
 export default async function handler(req, res) {
   const { code, state } = req.query;
 
-  // You should send the code_verifier from the plugin to the server (e.g., via cookies or a custom flow)
-  const codeVerifier = req.cookies?.figma_code_verifier || 'manually_copy_for_testing';
-
-  const params = new URLSearchParams({
+  const body = {
     client_id: process.env.FIGMA_CLIENT_ID,
     grant_type: 'authorization_code',
-    redirect_uri: process.env.REDIRECT_URI,
     code,
-    code_verifier: codeVerifier,
-  });
+    code_verifier: state,
+    redirect_uri: process.env.FIGMA_REDIRECT_URI
+  };
 
-  const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+  const response = await fetch('https://www.figma.com/api/oauth/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString(),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   });
 
-  const data = await tokenRes.json();
-
+  const data = await response.json();
   if (data.access_token) {
-    storeToken(state, data.access_token);
-    res.send('Login successful! You can close this tab and return to the plugin.');
+    storeToken(data.user_id, data.access_token);
+    res.redirect(`/success?user_id=${data.user_id}`);
   } else {
-    res.status(400).json(data);
+    res.status(400).json({ error: 'OAuth failed', details: data });
   }
 }
+

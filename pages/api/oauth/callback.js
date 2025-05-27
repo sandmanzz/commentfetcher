@@ -116,26 +116,45 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   const { code, state } = req.query;
 
-  const body = {
-    client_id: process.env.FIGMA_CLIENT_ID,
-    grant_type: 'authorization_code',
-    code,
-    code_verifier: state,
-    redirect_uri: process.env.FIGMA_REDIRECT_URI
-  };
+  if (!code || !state) {
+    return res.status(400).json({ error: "Missing code or state" });
+  }
 
-  const response = await fetch('https://www.figma.com/api/oauth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  try {
+    const params = new URLSearchParams();
+    params.append("client_id", process.env.FIGMA_CLIENT_ID);
+    params.append("client_secret", process.env.FIGMA_CLIENT_SECRET);
+    params.append("grant_type", "authorization_code");
+    params.append("code", code);
+    params.append("redirect_uri", process.env.FIGMA_REDIRECT_URI);
+    params.append("code_verifier", state); // must match what you used in code_challenge
 
-  const data = await response.json();
-  if (data.access_token) {
-    storeToken(data.user_id, data.access_token);
-    res.redirect(`/success?user_id=${data.user_id}`);
-  } else {
-    res.status(400).json({ error: 'OAuth failed', details: data });
+    const tokenRes = await fetch("https://www.figma.com/api/oauth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
+
+    if (!tokenRes.ok) {
+      const errorBody = await tokenRes.text();
+      console.error("Figma token exchange error:", errorBody);
+      return res.status(500).json({ error: "Token exchange failed", details: errorBody });
+    }
+
+    const tokenData = await tokenRes.json();
+
+    // Here you should securely save the tokens, for demo let's just return success
+    console.log("Token data:", tokenData);
+
+    // Redirect or show success page
+    return res.redirect("/?success=1");
+
+  } catch (error) {
+    console.error("Exception in OAuth callback:", error);
+    return res.status(500).json({ error: "Server error", details: error.message });
   }
 }
+
 

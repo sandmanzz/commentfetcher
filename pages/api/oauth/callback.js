@@ -122,38 +122,32 @@ export default async function handler(req, res) {
 
   try {
     const params = new URLSearchParams();
-    params.append("client_id", process.env.FIGMA_CLIENT_ID);
-    params.append("client_secret", process.env.FIGMA_CLIENT_SECRET);
-    params.append("grant_type", "authorization_code");
-    params.append("code", code);
-    params.append("redirect_uri", process.env.FIGMA_REDIRECT_URI);
-    params.append("code_verifier", state); // must match what you used in code_challenge
+    params.append('client_id', process.env.FIGMA_CLIENT_ID);
+    params.append('client_secret', process.env.FIGMA_CLIENT_SECRET);
+    params.append('grant_type', 'authorization_code');
+    params.append('code', code);
+    params.append('redirect_uri', process.env.FIGMA_REDIRECT_URI);
+    params.append('code_verifier', state); // state is used as code_verifier
 
-    const tokenRes = await fetch("https://api.figma.com/v1/oauth/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+    const tokenRes = await fetch('https://www.figma.com/api/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),
     });
 
+    const bodyText = await tokenRes.text();
     if (!tokenRes.ok) {
-      const errorBody = await tokenRes.text();
-      console.error("Figma token exchange error:", errorBody);
-      return res.status(500).json({ error: "Token exchange failed", details: errorBody });
+      console.error('OAuth Token Error:', bodyText);
+      return res.status(500).json({ error: 'Token exchange failed', details: bodyText });
     }
 
-    const tokenData = await tokenRes.json();
+    const tokenData = JSON.parse(bodyText);
 
-    // Here you should securely save the tokens, for demo let's just return success
-    console.log("Token data:", tokenData);
-
-    // Redirect or show success page
-    return res.redirect("/?success=1");
-
-  } catch (error) {
-    console.error("Exception in OAuth callback:", error);
-    return res.status(500).json({ error: "Server error", details: error.message });
+    // TEMP: redirect to plugin success page with token in query (insecure for production!)
+    return res.redirect(`https://www.figma.com/plugin-docs/oauth/?token=${tokenData.access_token}`);
+  } catch (e) {
+    console.error('OAuth callback error:', e);
+    return res.status(500).json({ error: 'Internal server error', details: e.message });
   }
 }
 

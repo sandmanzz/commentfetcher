@@ -114,16 +114,31 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  const { fileKey, pageName, userId } = req.query;
-  const token = getToken(userId);
+  //const { fileKey, pageName, userId } = req.query;
+  const { fileKey } = req.query;
+  const auth = req.headers.authorization;
 
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  if (!auth) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
-  const figmaRes = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  try {
+    const figmaRes = await fetch(`https://api.figma.com/v1/files/${fileKey}/comments`, {
+      headers: {
+        Authorization: auth,
+      },
+    });
 
-  const data = await figmaRes.json();
-  const filtered = data.comments.filter(c => c.parent === null && c.client_meta?.node_name?.includes(pageName));
-  res.json(filtered);
+    const data = await figmaRes.json();
+
+    if (!figmaRes.ok) {
+      console.error('Figma API error:', data);
+      return res.status(500).json({ error: 'Failed to fetch comments', details: data });
+    }
+
+    return res.status(200).json({ comments: data.comments || [] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error', details: err.message });
+  }
 }

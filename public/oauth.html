@@ -9,8 +9,12 @@
       const params = new URLSearchParams(window.location.search);
       const token = params.get('token');
       if (token) {
-        parent.postMessage({ pluginMessage: { type: 'oauth-token', token } }, '*');
-      }
+    console.log('[oauth.html] Sending token to parent...');
+    parent.postMessage({ pluginMessage: { type: 'oauth-token', token } }, '*');
+  } else {
+    console.error('[oauth.html] No token found!');
+  }
+      
     </script>
   </body>
 </html>

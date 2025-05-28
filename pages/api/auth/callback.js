@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString("base64")}`
+      "Authorization": `Basic ZsfKW7oFqEaSEMMGex3O2G:n9uWTExMsVfzCYrH3LRPuXgYWXlZYm`
     },
     body: new URLSearchParams({
       client_id,

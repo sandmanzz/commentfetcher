@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 export default async function handler(req, res) {
   const { code } = req.query;
   const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = process.env;

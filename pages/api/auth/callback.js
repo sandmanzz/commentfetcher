@@ -40,5 +40,5 @@ export default async function handler(req, res) {
   });
 
   const data = await response.json();
-  res.redirect(`/plugin.html#token=${data.access_token}`);
+  res.redirect(`/oauth.html#token=${data.access_token}`);
 }

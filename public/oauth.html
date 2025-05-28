@@ -6,15 +6,18 @@
   <body>
     <h1>Hi</h1>
     <script>
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get('token');
-      if (token) {
+  // Read the token from the hash, not the search query
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const token = hashParams.get('token');
+  console.log('[oauth.html] Token received from hash:', token);
+
+  if (token) {
     console.log('[oauth.html] Sending token to parent...');
     parent.postMessage({ pluginMessage: { type: 'oauth-token', token } }, '*');
   } else {
-    console.error('[oauth.html] No token found!');
+    console.error('[oauth.html] No token found in hash!');
   }
-      
-    </script>
+</script>
+
   </body>
 </html>

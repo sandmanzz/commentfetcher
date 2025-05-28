@@ -19,6 +19,11 @@ export default async function handler(req, res) {
 
 //   // Redirect to a page that can communicate with the plugin
 //   res.redirect(`/oauth.html?token=${access_token}`);
+  const client_id = "ZsfKW7oFqEaSEMMGex3O2G";
+  const client_secret = "n9uWTExMsVfzCYrH3LRPuXgYWXlZYm";
+  const redirect_uri = "https://commentfetcher.vercel.app/api/auth/callback";
+
+
  const response = await fetch("https://api.figma.com/v1/oauth/token", {
     method: "POST",
     headers: {

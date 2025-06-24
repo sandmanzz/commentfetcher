@@ -1,4 +1,3 @@
-
 export default async function handler(req, res) {
      if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*'); // or 'null' for Figma plugin
@@ -26,3 +25,9 @@ export default async function handler(req, res) {
   const data = await response.json();
   res.status(200).json(data);
 }
+
+// On /callback page
+const params = new URLSearchParams(window.location.hash.substring(1));
+const token = params.get('token');
+window.opener.postMessage({ type: 'auth-token', token }, '*');
+window.close();

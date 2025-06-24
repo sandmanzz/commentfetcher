@@ -21,3 +21,20 @@
 
   </body>
 </html>
+
+<script>
+  // Ensure the script runs after the DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Read the token from the hash, not the search query
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get('token');
+    console.log('[oauth.html] Token received from hash:', token);
+
+    if (token) {
+      console.log('[oauth.html] Sending token to parent...');
+      alert('Token received: ' + token); // Optional: Alert for debugging
+      parent.postMessage({ pluginMessage: { type: 'oauth-token', token } }, '*');
+    } else {
+      console.error('[oauth.html] No token found in hash!');
+    }
+  });

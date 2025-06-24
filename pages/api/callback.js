@@ -193,4 +193,10 @@ export default async function handler(req, res) {
   res.redirect(`/plugin.html#token=${data.access_token}`);
 }
 
+// On /callback page
+const params = new URLSearchParams(window.location.hash.substring(1));
+const token = params.get('token');
+window.opener.postMessage({ type: 'auth-token', token }, '*');
+window.close();
+
 
